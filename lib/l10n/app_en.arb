@@ -1,0 +1,64 @@
+{
+  "appTitle": "Learn Multiplication",
+  "appStarting": "App is starting...",
+  "nameLabel": "Please enter your name:",
+  "hello": "Hello {name}",
+  "@hello": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "highscore": "Your highscore: {highscore}",
+  "@highscore": {
+    "placeholders": {
+      "highscore": {}
+    }
+  },
+  "next": "Next",
+  "learn": "Practice",
+  "exerciseOf": "Exercise {exercise} of {numberOfExercises}",
+  "@exerciseOf": {
+    "placeholders": {
+      "exercise": {},
+      "numberOfExercises": {}
+    }
+  },
+  "challenge": "Challenge",
+  "remainingTime": "{seconds} seconds",
+  "@remainingTime": {
+    "placeholders": {
+      "seconds": {}
+    }
+  },
+  "check": "Check",
+  "correct": "Correct",
+  "wrong": "Wrong",
+  "practiceResultMessage": "You have answered {correctAnswers} of {numberOfExercises} exercises correctly.",
+  "@practiceResultMessage": {
+    "placeholders": {
+      "correctAnswers": {},
+      "numberOfExercises": {}
+    }
+  },
+  "continuePractice": "Continue practice",
+  "backToMenu": "Back to menu",
+  "challengeResultMessage": "You have done {numberOfExercises} exercises.",
+  "@challengeResultMessage": {
+    "placeholders": {
+      "numberOfExercises": {}
+    }
+  },
+  "settings": "Settings",
+  "themeTitle": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "colorTitle": "Accent Color",
+  "colorPickerButton": "More colors",
+  "colorPickerTitle": "Pick a color",
+  "colorPickerCancel": "Cancel",
+  "colorPickerConfirm": "Choose",
+  "creditsTitle": "Credits",
+  "sourceCodeTitle": "Source Code",
+  "sourceCodeLink": "Visit the GitHub repository"
+}
