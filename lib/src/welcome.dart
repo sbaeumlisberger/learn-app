@@ -11,7 +11,7 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  final nameController = TextEditingController();
+  final _nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class _WelcomePageState extends State<WelcomePage> {
               children: <Widget>[
                 const Image(image: AssetImage('images/robot_hello.png'), height: 300),
                 Text(msg.nameLabel),
-                TextField(controller: nameController, textAlign: TextAlign.center),
+                TextField(controller: _nameController, textAlign: TextAlign.center),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _next,
@@ -45,7 +45,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
   void _next() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setString('username', nameController.value.text);
+    await preferences.setString('username', _nameController.value.text);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),

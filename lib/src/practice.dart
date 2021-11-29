@@ -14,22 +14,22 @@ class PracticePage extends StatefulWidget {
 }
 
 class _PracticePageState extends State<PracticePage> {
-  final numberOfExercises = 10;
+  final _numberOfExercises = 10;
 
-  final resultController = TextEditingController();
+  final _resultController = TextEditingController();
 
-  int exercise = 1;
+  int _exercise = 1;
 
-  int num1 = Random().nextInt(11);
-  int num2 = Random().nextInt(11);
+  int _num1 = Random().nextInt(11);
+  int _num2 = Random().nextInt(11);
 
-  bool showResult = false;
+  bool _showResult = false;
 
-  bool answerCorrect = false;
+  bool _answerCorrect = false;
 
-  int correctAnswers = 0;
+  int _correctAnswers = 0;
 
-  bool finished = false;
+  bool _finished = false;
 
   @override
   void initState() {
@@ -49,11 +49,11 @@ class _PracticePageState extends State<PracticePage> {
           children: <Widget>[
             Visibility(
               child: _buildPracticeView(msg),
-              visible: !finished,
+              visible: !_finished,
             ),
             Visibility(
               child: _buildEndView(msg, context),
-              visible: finished,
+              visible: _finished,
             )
           ],
         ),
@@ -65,19 +65,19 @@ class _PracticePageState extends State<PracticePage> {
     return Column(
       children: <Widget>[
         LinearProgressIndicator(
-          value: (exercise - 1) / numberOfExercises,
+          value: (_exercise - 1) / _numberOfExercises,
         ),
         const SizedBox(height: 4),
-        Text(msg.exerciseOf(exercise, numberOfExercises)),
+        Text(msg.exerciseOf(_exercise, _numberOfExercises)),
         Expanded(
           child: Center(
             child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  Text(num1.toString() + " * " + num2.toString(), style: const TextStyle(fontSize: 32)),
+                  Text(_num1.toString() + " * " + _num2.toString(), style: const TextStyle(fontSize: 32)),
                   const SizedBox(height: 24),
                   TextField(
-                      controller: resultController,
+                      controller: _resultController,
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       style: const TextStyle(fontSize: 24)),
@@ -87,19 +87,19 @@ class _PracticePageState extends State<PracticePage> {
                       onPressed: _check,
                       child: Text(msg.check),
                     ),
-                    visible: !showResult,
+                    visible: !_showResult,
                   ),
                   Visibility(
                     child: Container(
                         padding: const EdgeInsets.all(16),
                         width: double.infinity,
-                        color: answerCorrect ? Colors.lightGreen : Colors.red,
+                        color: _answerCorrect ? Colors.lightGreen : Colors.red,
                         child: Text(
-                          answerCorrect ? msg.correct : msg.wrong,
+                          _answerCorrect ? msg.correct : msg.wrong,
                           textAlign: TextAlign.center,
                           style: const TextStyle(color: Colors.white),
                         )),
-                    visible: showResult,
+                    visible: _showResult,
                   )
                 ],
               ),
@@ -118,14 +118,14 @@ class _PracticePageState extends State<PracticePage> {
           children: [
             Visibility(
               child: Image(image: AssetImage('images/robot_good_result_' + language + '.png'), height: 300),
-              visible: correctAnswers >= numberOfExercises * 0.7,
+              visible: _correctAnswers >= _numberOfExercises * 0.7,
             ),
             Visibility(
               child: Image(image: AssetImage('images/robot_bad_result_' + language + '.png'), height: 300),
-              visible: correctAnswers < numberOfExercises * 0.7,
+              visible: _correctAnswers < _numberOfExercises * 0.7,
             ),
             const SizedBox(height: 32),
-            Text(msg.practiceResultMessage(correctAnswers, numberOfExercises), textAlign: TextAlign.center),
+            Text(msg.practiceResultMessage(_correctAnswers, _numberOfExercises), textAlign: TextAlign.center),
             const SizedBox(height: 32),
             ElevatedButton(onPressed: _continuePractice, child: Text(msg.continuePractice)),
             const SizedBox(height: 16),
@@ -137,48 +137,48 @@ class _PracticePageState extends State<PracticePage> {
   }
 
   void _check() async {
-    int? answer = int.tryParse(resultController.value.text);
+    int? answer = int.tryParse(_resultController.value.text);
 
-    int expectedResult = num1 * num2;
+    int expectedResult = _num1 * _num2;
 
     setState(() {
-      answerCorrect = answer == expectedResult;
+      _answerCorrect = answer == expectedResult;
 
-      if (answerCorrect) {
-        correctAnswers++;
+      if (_answerCorrect) {
+        _correctAnswers++;
       }
 
-      showResult = true;
+      _showResult = true;
     });
 
     Future.delayed(const Duration(milliseconds: 500), _next);
   }
 
   void _next() async {
-    if (exercise < numberOfExercises) {
+    if (_exercise < _numberOfExercises) {
       setState(() {
-        exercise++;
-        num1 = Random().nextInt(10) + 1;
-        num2 = Random().nextInt(10) + 1;
-        resultController.clear();
-        showResult = false;
+        _exercise++;
+        _num1 = Random().nextInt(10) + 1;
+        _num2 = Random().nextInt(10) + 1;
+        _resultController.clear();
+        _showResult = false;
       });
     } else {
       setState(() {
-        finished = true;
+        _finished = true;
       });
     }
   }
 
   void _continuePractice() {
     setState(() {
-      exercise = 1;
-      num1 = Random().nextInt(11);
-      num2 = Random().nextInt(11);
-      resultController.clear();
-      correctAnswers = 0;
-      showResult = false;
-      finished = false;
+      _exercise = 1;
+      _num1 = Random().nextInt(11);
+      _num2 = Random().nextInt(11);
+      _resultController.clear();
+      _correctAnswers = 0;
+      _showResult = false;
+      _finished = false;
     });
   }
 
