@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:learn_app/src/startup.dart';
+import 'package:learn_app/src/home.dart';
+import 'package:learn_app/src/persistence_service.dart';
+import 'package:learn_app/src/service_locator.dart';
 import 'package:learn_app/src/theme.dart';
 import 'package:learn_app/src/utils.dart';
+import 'package:learn_app/src/welcome.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
+  setupServiceLocator();
+  await getIt<PersistenceService>().init();
   runApp(const LearnApp());
 }
 
@@ -27,7 +32,7 @@ class LearnApp extends StatelessWidget {
             themeMode: theme.themeMode,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: const StartupPage());
+            home: getIt<PersistenceService>().existsKey("username") ? const HomePage() : const WelcomePage());
       }),
     );
   }

@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:learn_app/src/persistence_service.dart';
+import 'package:learn_app/src/service_locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home.dart';
@@ -16,49 +18,56 @@ class ChallengePage extends StatefulWidget {
 }
 
 class _ChallengePageState extends State<ChallengePage> {
-  Duration challengeTime = const Duration(seconds: 30);
+  final _persistenceService = getIt<PersistenceService>();
 
-  Duration remainingTime = Duration.zero;
+  final Duration _challengeTime = const Duration(seconds: 30);
 
-  Timer? timer;
+  Duration _remainingTime = Duration.zero;
 
-  int num1 = 0;
-  int num2 = 0;
+  Timer? _timer;
 
-  int answer1 = 0;
-  int answer2 = 0;
-  int answer3 = 0;
-  int answer4 = 0;
+  int _num1 = 0;
+  int _num2 = 0;
 
-  int selectedAnswer = 0;
+  int _answer1 = 0;
+  int _answer2 = 0;
+  int _answer3 = 0;
+  int _answer4 = 0;
 
-  int exercises = 0;
+  int _selectedAnswer = 0;
 
-  bool finished = false;
+  int _exercises = 0;
 
-  int? highscore;
+  bool _newHighscore = false;
+  bool _goodResult = false;
+  bool _badResult = false;
+
+  bool _finished = false;
+
+  int _highscore = 0;
 
   @override
   void initState() {
     super.initState();
     _startChallenge();
-    SharedPreferences.getInstance().then((preferences) {
-      highscore = preferences.getInt("highscore");
-    });
+    _highscore = _persistenceService.getInt("highscore") ?? 0;
   }
 
   void _startTimer() {
-    timer?.cancel();
-    timer = null;
-    remainingTime = challengeTime;
-    timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer?.cancel();
+    _timer = null;
+    _remainingTime = _challengeTime;
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
-        remainingTime = Duration(seconds: remainingTime.inSeconds - 1);
-        if (remainingTime.inSeconds == 0) {
-          timer?.cancel();
-          timer = null;
-          finished = true;
-          SharedPreferences.getInstance().then((preferences) => preferences.setInt("highscore", exercises));
+        _remainingTime = Duration(seconds: _remainingTime.inSeconds - 1);
+        if (_remainingTime.inSeconds == 0) {
+          _timer?.cancel();
+          _timer = null;
+          _newHighscore = _exercises > _highscore;
+          _goodResult = !_newHighscore && _exercises > _highscore * 0.7;
+          _badResult = !_newHighscore && !_goodResult;
+          _finished = true;
+          _persistenceService.setInt("highscore", _exercises);
         }
       });
     });
@@ -66,7 +75,7 @@ class _ChallengePageState extends State<ChallengePage> {
 
   @override
   void dispose() {
-    timer?.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -75,105 +84,131 @@ class _ChallengePageState extends State<ChallengePage> {
     var msg = AppLocalizations.of(context)!;
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(msg.appTitle),
+      appBar: AppBar(
+        title: Text(msg.appTitle),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Stack(
+          children: <Widget>[
+            Visibility(
+              child: _buildChallengeView(msg),
+              visible: !_finished,
+            ),
+            Visibility(
+              child: _buildEndView(msg, context),
+              visible: _finished,
+            )
+          ],
         ),
-        body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Stack(children: <Widget>[
-              Visibility(
-                child: _buildChallengeView(msg),
-                visible: !finished,
+      ),
+    );
+  }
+
+  Widget _buildChallengeView(AppLocalizations msg) {
+    return Column(
+      children: <Widget>[
+        LinearProgressIndicator(
+          value: _remainingTime.inSeconds / _challengeTime.inSeconds,
+        ),
+        const SizedBox(height: 4),
+        Text(msg.remainingTime(_remainingTime.inSeconds)),
+        Expanded(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(_num1.toString() + " * " + _num2.toString(), style: const TextStyle(fontSize: 32)),
+                  const SizedBox(height: 64),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildAnswerButton(_answer1),
+                      _buildAnswerButton(_answer2),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildAnswerButton(_answer3),
+                      _buildAnswerButton(_answer4),
+                    ],
+                  ),
+                ],
               ),
-              Visibility(
-                child: _buildEndView(msg, context),
-                visible: finished,
-              )
-            ])));
+            ),
+          ),
+        )
+      ],
+    );
   }
 
-  Column _buildChallengeView(AppLocalizations msg) {
-    return Column(children: <Widget>[
-      LinearProgressIndicator(
-        value: remainingTime.inSeconds / challengeTime.inSeconds,
-      ),
-      const SizedBox(height: 4),
-      Text(msg.remainingTime(remainingTime.inSeconds)),
-      Expanded(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text(num1.toString() + " * " + num2.toString(), style: const TextStyle(fontSize: 32)),
-        const SizedBox(height: 64),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          buildAnswerButton(answer1),
-          buildAnswerButton(answer2),
-        ]),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          buildAnswerButton(answer3),
-          buildAnswerButton(answer4),
-        ])
-      ]))
-    ]);
-  }
-
-  Padding buildAnswerButton(int answer) {
-    int expectedResult = num1 * num2;
+  Widget _buildAnswerButton(int answer) {
+    int expectedResult = _num1 * _num2;
     return Padding(
-        padding: const EdgeInsets.all(4),
-        child: ElevatedButton(
-            onPressed: () {
-              selectedAnswer == 0 ? _check(answer) : null;
-            },
-            child: Text(answer.toString(), style: const TextStyle(fontSize: 16)),
-            style: selectedAnswer == answer
-                ? ElevatedButton.styleFrom(
-                    fixedSize: const Size(64, 64), primary: expectedResult == answer ? Colors.lightGreen : Colors.red)
-                : ElevatedButton.styleFrom(fixedSize: const Size(64, 64))));
+      padding: const EdgeInsets.all(4),
+      child: ElevatedButton(
+        onPressed: () {
+          _selectedAnswer == 0 ? _check(answer) : null;
+        },
+        child: Text(answer.toString(), style: const TextStyle(fontSize: 20)),
+        style: _selectedAnswer == answer
+            ? ElevatedButton.styleFrom(
+                fixedSize: const Size(128, 128), primary: expectedResult == answer ? Colors.lightGreen : Colors.red)
+            : ElevatedButton.styleFrom(fixedSize: const Size(128, 128)),
+      ),
+    );
   }
 
-  Column _buildEndView(AppLocalizations msg, BuildContext context) {
+  Widget _buildEndView(AppLocalizations msg, BuildContext context) {
     String language = Localizations.localeOf(context).languageCode;
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Visibility(
-        child: Image(image: AssetImage('images/robot_new_highscore_' + language + '.png')),
-        visible: isNewHighscore(),
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Visibility(
+                child: Image(image: AssetImage('images/robot_new_highscore_' + language + '.png'), height: 300),
+                visible: _newHighscore),
+            Visibility(
+              child: Image(image: AssetImage('images/robot_good_result_' + language + '.png'), height: 300),
+              visible: _goodResult,
+            ),
+            Visibility(
+              child: Image(image: AssetImage('images/robot_bad_result_' + language + '.png'), height: 300),
+              visible: _badResult,
+            ),
+            const SizedBox(height: 32),
+            Text(msg.challengeResultMessage(_exercises), textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+            ElevatedButton(onPressed: _startChallenge, child: Text(msg.continuePractice)),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: _backToMenu, child: Text(msg.backToMenu))
+          ],
+        ),
       ),
-      Visibility(
-        child: Image(image: AssetImage('images/robot_good_result_' + language + '.png')),
-        visible: !isNewHighscore() && isGoodResult(),
-      ),
-      Visibility(
-        child: Image(image: AssetImage('images/robot_bad_result_' + language + '.png')),
-        visible: !isNewHighscore() && !isGoodResult(),
-      ),
-      const SizedBox(height: 32),
-      Text(msg.challengeResultMessage(exercises), textAlign: TextAlign.center),
-      const SizedBox(height: 32),
-      ElevatedButton(onPressed: _startChallenge, child: Text(msg.continuePractice)),
-      const SizedBox(height: 16),
-      ElevatedButton(onPressed: _backToMenu, child: Text(msg.backToMenu))
-    ]);
+    );
   }
 
   void _startChallenge() {
     _next();
     setState(() {
-      exercises = 0;
-      finished = false;
+      _exercises = 0;
+      _finished = false;
     });
     _startTimer();
   }
 
   void _next() {
     setState(() {
-      num1 = Random().nextInt(10) + 1;
-      num2 = Random().nextInt(10) + 1;
-      int result = num1 * num2;
+      _num1 = Random().nextInt(10) + 1;
+      _num2 = Random().nextInt(10) + 1;
+      int result = _num1 * _num2;
       int correctAnswer = Random().nextInt(4) + 1;
-      answer1 = correctAnswer == 1 ? result : _randomResult([result]);
-      answer2 = correctAnswer == 2 ? result : _randomResult([result, answer1]);
-      answer3 = correctAnswer == 3 ? result : _randomResult([result, answer1, answer2]);
-      answer4 = correctAnswer == 4 ? result : _randomResult([result, answer1, answer2, answer3]);
-      selectedAnswer = 0;
+      _answer1 = correctAnswer == 1 ? result : _randomResult([result]);
+      _answer2 = correctAnswer == 2 ? result : _randomResult([result, _answer1]);
+      _answer3 = correctAnswer == 3 ? result : _randomResult([result, _answer1, _answer2]);
+      _answer4 = correctAnswer == 4 ? result : _randomResult([result, _answer1, _answer2, _answer3]);
+      _selectedAnswer = 0;
     });
   }
 
@@ -186,16 +221,16 @@ class _ChallengePageState extends State<ChallengePage> {
   }
 
   void _check(int answer) async {
-    int expectedResult = num1 * num2;
+    int expectedResult = _num1 * _num2;
 
     bool answerCorrect = answer == expectedResult;
 
     setState(() {
-      selectedAnswer = answer;
+      _selectedAnswer = answer;
     });
 
     if (answerCorrect) {
-      exercises++;
+      _exercises++;
       Future.delayed(const Duration(milliseconds: 500), _next);
     } else {
       Future.delayed(const Duration(milliseconds: 500), _resetSelection);
@@ -204,16 +239,8 @@ class _ChallengePageState extends State<ChallengePage> {
 
   void _resetSelection() {
     setState(() {
-      selectedAnswer = 0;
+      _selectedAnswer = 0;
     });
-  }
-
-  bool isNewHighscore() {
-    return exercises > (highscore ?? 0);
-  }
-
-  bool isGoodResult() {
-    return exercises > (highscore ?? 10) * 0.7;
   }
 
   void _backToMenu() {

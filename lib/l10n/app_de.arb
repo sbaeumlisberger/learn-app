@@ -1,8 +1,8 @@
 {
   "appTitle": "Lern das Einmaleins",
-  "appStarting": "Anwendung wird gestartet...",
   "nameLabel": "Bitte gib deinen Namen ein:",
-  "hello": "Hallo {name}",
+  "homeHello": "Hallo {name}",
+  "homeQuestion": "Was möchtest du machen?",
   "highscore": "Dein Highscore: {highscore}",
   "next": "Weiter",
   "learn": "Training",
@@ -27,6 +27,6 @@
   "colorPickerCancel": "Abbrechen",
   "colorPickerConfirm": "Auswählen",
   "creditsTitle": "Credits",
-  "sourceCodeTitle": "Source Code",
+  "sourceCodeTitle": "Quellcode",
   "sourceCodeLink": "GitHub Repository aufrufen"
 }

@@ -1,13 +1,13 @@
 {
   "appTitle": "Learn Multiplication",
-  "appStarting": "App is starting...",
   "nameLabel": "Please enter your name:",
-  "hello": "Hello {name}",
-  "@hello": {
+  "homeHello": "Hello {name}",
+  "@homeHello": {
     "placeholders": {
       "name": {}
     }
   },
+  "homeQuestion": "What do you want to do?",
   "highscore": "Your highscore: {highscore}",
   "@highscore": {
     "placeholders": {

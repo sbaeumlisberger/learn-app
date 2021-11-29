@@ -39,26 +39,29 @@ class _PracticePageState extends State<PracticePage> {
   @override
   Widget build(BuildContext context) {
     var msg = AppLocalizations.of(context)!;
-
     return Scaffold(
-        appBar: AppBar(
-          title: Text(msg.appTitle),
+      appBar: AppBar(
+        title: Text(msg.appTitle),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Stack(
+          children: <Widget>[
+            Visibility(
+              child: _buildPracticeView(msg),
+              visible: !finished,
+            ),
+            Visibility(
+              child: _buildEndView(msg, context),
+              visible: finished,
+            )
+          ],
         ),
-        body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Stack(children: <Widget>[
-              Visibility(
-                child: _buildLearnView(msg),
-                visible: !finished,
-              ),
-              Visibility(
-                child: _buildEndView(msg, context),
-                visible: finished,
-              )
-            ])));
+      ),
+    );
   }
 
-  Column _buildLearnView(AppLocalizations msg) {
+  Widget _buildPracticeView(AppLocalizations msg) {
     return Column(
       children: <Widget>[
         LinearProgressIndicator(
@@ -67,72 +70,69 @@ class _PracticePageState extends State<PracticePage> {
         const SizedBox(height: 4),
         Text(msg.exerciseOf(exercise, numberOfExercises)),
         Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(num1.toString() + " * " + num2.toString(),
-                  style: const TextStyle(fontSize: 32)),
-              const SizedBox(height: 24),
-              TextField(
-                  controller: resultController,
-                  textAlign: TextAlign.center,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(fontSize: 24)),
-              const SizedBox(height: 32),
-              Visibility(
-                child: ElevatedButton(
-                  onPressed: _check,
-                  child: Text(msg.check),
-                ),
-                visible: !showResult,
-              ),
-              Visibility(
-                child: Container(
-                    padding: const EdgeInsets.all(6),
-                    width: double.infinity,
-                    color: answerCorrect ? Colors.lightGreen : Colors.red,
-                    child: Text(
-                      answerCorrect ? msg.correct : msg.wrong,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Text(num1.toString() + " * " + num2.toString(), style: const TextStyle(fontSize: 32)),
+                  const SizedBox(height: 24),
+                  TextField(
+                      controller: resultController,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white),
-                    )),
-                visible: showResult,
-              )
-            ],
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 24)),
+                  const SizedBox(height: 32),
+                  Visibility(
+                    child: ElevatedButton(
+                      onPressed: _check,
+                      child: Text(msg.check),
+                    ),
+                    visible: !showResult,
+                  ),
+                  Visibility(
+                    child: Container(
+                        padding: const EdgeInsets.all(16),
+                        width: double.infinity,
+                        color: answerCorrect ? Colors.lightGreen : Colors.red,
+                        child: Text(
+                          answerCorrect ? msg.correct : msg.wrong,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white),
+                        )),
+                    visible: showResult,
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Column _buildEndView(AppLocalizations msg, BuildContext context) {
-    String language = Localizations
-        .localeOf(context)
-        .languageCode;
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Visibility(
-          child: Image(
-              image:
-              AssetImage('images/robot_good_result_' + language + '.png')),
-          visible: correctAnswers >= numberOfExercises * 0.7,
+  Widget _buildEndView(AppLocalizations msg, BuildContext context) {
+    String language = Localizations.localeOf(context).languageCode;
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Visibility(
+              child: Image(image: AssetImage('images/robot_good_result_' + language + '.png'), height: 300),
+              visible: correctAnswers >= numberOfExercises * 0.7,
+            ),
+            Visibility(
+              child: Image(image: AssetImage('images/robot_bad_result_' + language + '.png'), height: 300),
+              visible: correctAnswers < numberOfExercises * 0.7,
+            ),
+            const SizedBox(height: 32),
+            Text(msg.practiceResultMessage(correctAnswers, numberOfExercises), textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+            ElevatedButton(onPressed: _continuePractice, child: Text(msg.continuePractice)),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: _backToMenu, child: Text(msg.backToMenu))
+          ],
         ),
-        Visibility(
-          child: Image(
-              image:
-              AssetImage('images/robot_bad_result_' + language + '.png')),
-          visible: correctAnswers < numberOfExercises * 0.7,
-        ),
-        const SizedBox(height: 32),
-        Text(msg.practiceResultMessage(correctAnswers, numberOfExercises),
-            textAlign: TextAlign.center),
-        const SizedBox(height: 32),
-        ElevatedButton(
-            onPressed: _continuePractice, child: Text(msg.continuePractice)),
-        const SizedBox(height: 16),
-        ElevatedButton(onPressed: _backToMenu, child: Text(msg.backToMenu))
-      ],
+      ),
     );
   }
 

@@ -41,6 +41,7 @@ dependencies:
   url_launcher: ^6.0.15
   flutter_colorpicker: ^1.0.2
   fast_immutable_collections: ^7.0.3
+  get_it: ^6.0.0
 
 dev_dependencies:
   flutter_test:

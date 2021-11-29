@@ -23,19 +23,20 @@ class _WelcomePageState extends State<WelcomePage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Image(image: AssetImage('images/robot_hello.png')),
-              Text(msg.nameLabel),
-              TextField(
-                  controller: nameController, textAlign: TextAlign.center),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _next,
-                child: Text(msg.next),
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Image(image: AssetImage('images/robot_hello.png'), height: 300),
+                Text(msg.nameLabel),
+                TextField(controller: nameController, textAlign: TextAlign.center),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _next,
+                  child: Text(msg.next),
+                )
+              ],
+            ),
           ),
         ),
       ),
