@@ -1,8 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.dhbw.learn_app">
    <application
-        android:label="learn_app"
-        android:icon="@mipmap/ic_launcher">
+        android:label="1x1"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
