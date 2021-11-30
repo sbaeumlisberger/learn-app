@@ -20,8 +20,8 @@ class _PracticePageState extends State<PracticePage> {
 
   int _exercise = 1;
 
-  int _num1 = Random().nextInt(11);
-  int _num2 = Random().nextInt(11);
+  int _num1 = Random().nextInt(10) + 1;
+  int _num2 = Random().nextInt(10) + 1;
 
   bool _showResult = false;
 
@@ -173,8 +173,8 @@ class _PracticePageState extends State<PracticePage> {
   void _continuePractice() {
     setState(() {
       _exercise = 1;
-      _num1 = Random().nextInt(11);
-      _num2 = Random().nextInt(11);
+      _num1 = Random().nextInt(10) + 1;
+      _num2 = Random().nextInt(10) + 1;
       _resultController.clear();
       _correctAnswers = 0;
       _showResult = false;

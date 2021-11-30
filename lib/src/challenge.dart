@@ -67,7 +67,9 @@ class _ChallengePageState extends State<ChallengePage> {
           _goodResult = !_newHighscore && _exercises > _highscore * 0.7;
           _badResult = !_newHighscore && !_goodResult;
           _finished = true;
-          _persistenceService.setInt("highscore", _exercises);
+          if (_newHighscore) {
+            _persistenceService.setInt("highscore", _exercises);
+          }
         }
       });
     });
