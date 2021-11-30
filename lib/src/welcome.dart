@@ -3,8 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:learn_app/src/home.dart';
 import 'package:learn_app/src/persistence_service.dart';
 import 'package:learn_app/src/service_locator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+/// The welcome page is shown on the first app start and allows the user to enter his name.
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
 
@@ -47,8 +47,8 @@ class _WelcomePageState extends State<WelcomePage> {
     );
   }
 
+  /// Persists the entered name and shows the home page.
   void _next() async {
-    // persist entered username
     await _persistenceService.setString('username', _nameController.value.text);
     Navigator.pushReplacement(
       context,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:learn_app/src/persistence_service.dart';
 import 'package:learn_app/src/service_locator.dart';
 
+/// Manages the theme settings and provides change notifications.
 class ThemeNotifier extends ChangeNotifier {
   final PersistenceService _persistenceService = getIt<PersistenceService>();
 

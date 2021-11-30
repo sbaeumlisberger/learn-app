@@ -9,11 +9,11 @@ import 'package:learn_app/src/welcome.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  setupServiceLocator(); // must be called before using getIt
-  await getIt<PersistenceService>().init(); // wait for initialization of persistence service
-  runApp(const LearnApp()); // start the app
+  await setupServiceLocator(); // Registers the services to be used in the app
+  runApp(const LearnApp()); // Start the app
 }
 
+/// Primary widget of the app. Handles theme settings and shows the first page.
 class LearnApp extends StatelessWidget {
   const LearnApp({Key? key}) : super(key: key);
 

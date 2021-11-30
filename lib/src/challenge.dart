@@ -6,9 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:learn_app/src/persistence_service.dart';
 import 'package:learn_app/src/service_locator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'home.dart';
 
 class ChallengePage extends StatefulWidget {
   const ChallengePage({Key? key}) : super(key: key);
@@ -17,9 +14,13 @@ class ChallengePage extends StatefulWidget {
   State<ChallengePage> createState() => _ChallengePageState();
 }
 
+/// The challenge page show the user exercises until the specified time has elapsed.
+/// The user has to answer the exercises via multiple choice.
+/// At the end the results are shown and the user can retry or return to the menu.
 class _ChallengePageState extends State<ChallengePage> {
   final _persistenceService = getIt<PersistenceService>();
 
+  /// The duration the user has to answer exercises.
   final Duration _challengeTime = const Duration(seconds: 30);
 
   Duration _remainingTime = Duration.zero;
@@ -34,8 +35,10 @@ class _ChallengePageState extends State<ChallengePage> {
   int _answer3 = 0;
   int _answer4 = 0;
 
+  /// The value of the selected answer or 0 if no answer is selected
   int _selectedAnswer = 0;
 
+  /// the number of exercises the user has solved
   int _exercises = 0;
 
   bool _newHighscore = false;
@@ -84,6 +87,7 @@ class _ChallengePageState extends State<ChallengePage> {
     );
   }
 
+  /// Builds the challenge view showing the exercises and four buttons with answers.
   Widget _buildChallengeView(AppLocalizations msg) {
     return Column(
       children: <Widget>[
@@ -122,6 +126,8 @@ class _ChallengePageState extends State<ChallengePage> {
     );
   }
 
+  /// Builds an answer button. When the button is pressed it is
+  /// highlighted green for the correct answer, otherwise red.
   Widget _buildAnswerButton(int answer) {
     int expectedResult = _num1 * _num2;
     return Padding(
@@ -142,6 +148,7 @@ class _ChallengePageState extends State<ChallengePage> {
     );
   }
 
+  /// Builds the result view.
   Widget _buildEndView(AppLocalizations msg, BuildContext context) {
     String language = Localizations.localeOf(context).languageCode;
     return Center(
@@ -171,6 +178,7 @@ class _ChallengePageState extends State<ChallengePage> {
     );
   }
 
+  /// Shows the first exercises and starts the timer.
   void _startChallenge() {
     _next();
     setState(() {
@@ -180,6 +188,7 @@ class _ChallengePageState extends State<ChallengePage> {
     _startTimer();
   }
 
+  /// Shows a new exercise.
   void _next() {
     setState(() {
       _num1 = Random().nextInt(10) + 1;
@@ -194,12 +203,15 @@ class _ChallengePageState extends State<ChallengePage> {
     });
   }
 
+  /// Starts a new timer.
   void _startTimer() {
     _remainingTime = _challengeTime; // reset remaining time
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _timerCallback());
   }
 
+  /// Called periodically by the timer. Updates the remaining time
+  /// and show the result view when the time has elapsed.
   Future<void> _timerCallback() async {
     setState(() {
       _remainingTime = Duration(seconds: _remainingTime.inSeconds - 1);
@@ -213,12 +225,13 @@ class _ChallengePageState extends State<ChallengePage> {
         _finished = true;
       }
     });
-    if (_newHighscore) {
+    if (_remainingTime.inSeconds == 0 && _newHighscore) {
       _highscore = _exercises;
       await _persistenceService.setInt("highscore", _exercises);
     }
   }
 
+  /// Generates a random exercise result excluding the specified values.
   int _randomResult(List<int> exclude) {
     int result = 0;
     do {
@@ -227,6 +240,7 @@ class _ChallengePageState extends State<ChallengePage> {
     return result;
   }
 
+  /// Checks the specified answer and shows visual feedback.
   void _check(int answer) async {
     int expectedResult = _num1 * _num2;
 
@@ -246,6 +260,7 @@ class _ChallengePageState extends State<ChallengePage> {
     }
   }
 
+  /// Resets the visual feedback
   void _resetSelection() {
     setState(() {
       _selectedAnswer = 0;

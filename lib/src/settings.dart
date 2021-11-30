@@ -8,6 +8,8 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
 import '../main.dart';
 
+/// The settings page allows the user to change the theme and accent color.
+/// Furthermore credits and a link to the source code are part of the page
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
@@ -77,6 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// Builds a color picker with some predefined colors and a custom color chosen by the user.
   Widget _buildSimpleColorPicker() {
     // if no custom color selected, fallback to users accentColor
     _customColor ??= Provider.of<ThemeNotifier>(context).accentColor;
@@ -102,6 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// Shows an advanced color picker which allows the user to chose a custom color.
   void _showAdvancedColorPicker(BuildContext context) {
     Color pickedColor = Provider.of<ThemeNotifier>(context, listen: false).accentColor;
     var msg = AppLocalizations.of(context)!;

@@ -5,8 +5,9 @@ import 'package:learn_app/src/practice.dart';
 import 'package:learn_app/src/challenge.dart';
 import 'package:learn_app/src/service_locator.dart';
 import 'package:learn_app/src/settings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+/// The home page shows the menu which allows the user to start a practice/challenge or open the settings.
+/// On the top of the page the users highscore is shown.
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -73,6 +74,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
     );
   }
 
+  /// Updates the highscore at the top of the page.
   void _updateHighscore() {
     setState(() {
       highscore = _persistenceService.getInt("highscore") ?? 0;

@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Service to persist data as simple key value pairs. Call the init method before accessing any other method.
 class PersistenceService {
   late SharedPreferences _sharedPreferences;
 
+  /// Initializes the persistence service.
+  /// This method must be called before calling any other method.
   Future<void> init() async {
     WidgetsFlutterBinding.ensureInitialized(); // needed to access SharedPreferences
     _sharedPreferences = await SharedPreferences.getInstance();

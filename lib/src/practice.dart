@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// The practice page shows the user multiple exercises where he/she has to enter the result in a text field.
+/// At the end the results are shown and the user can continue practice or return to the menu.
 class PracticePage extends StatefulWidget {
   const PracticePage({Key? key}) : super(key: key);
 
@@ -11,15 +13,18 @@ class PracticePage extends StatefulWidget {
 }
 
 class _PracticePageState extends State<PracticePage> {
+  /// The number of exercises the user has to solve
   final _numberOfExercises = 10;
 
   final _resultController = TextEditingController();
 
+  /// Indicates the current exercise
   int _exercise = 1;
 
   int _num1 = Random().nextInt(10) + 1;
   int _num2 = Random().nextInt(10) + 1;
 
+  /// Indicates if the visual feedback is shown
   bool _showResult = false;
 
   bool _answerCorrect = false;
@@ -58,6 +63,7 @@ class _PracticePageState extends State<PracticePage> {
     );
   }
 
+  /// Builds the practice view showing the exercise and text field to enter the result.
   Widget _buildPracticeView(AppLocalizations msg) {
     return Column(
       children: <Widget>[
@@ -107,6 +113,7 @@ class _PracticePageState extends State<PracticePage> {
     );
   }
 
+  /// Builds the result view.
   Widget _buildEndView(AppLocalizations msg, BuildContext context) {
     String language = Localizations.localeOf(context).languageCode;
     return Center(
@@ -133,6 +140,7 @@ class _PracticePageState extends State<PracticePage> {
     );
   }
 
+  /// Checks if the entered result is correct and provides visual feedback.
   void _check() async {
     int? answer = int.tryParse(_resultController.value.text);
 
@@ -151,6 +159,7 @@ class _PracticePageState extends State<PracticePage> {
     Future.delayed(const Duration(milliseconds: 500), _next);
   }
 
+  /// Show the next exercises or the results view if the target number of exercises is reached.
   void _next() async {
     if (_exercise < _numberOfExercises) {
       setState(() {
@@ -167,6 +176,7 @@ class _PracticePageState extends State<PracticePage> {
     }
   }
 
+  /// Resets the view to start a new practice.
   void _continuePractice() {
     setState(() {
       _exercise = 1;
