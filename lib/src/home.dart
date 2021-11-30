@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ChallengePage()),
-    ).then((value) => _updateHighscore());
+    ).then((value) => _updateHighscore()); // update highscore on return from challenge
   }
 
   void _settings() async {

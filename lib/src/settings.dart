@@ -18,6 +18,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final _titleStyle = const TextStyle(fontSize: 24);
 
+  /// color selected by the user via color picker dialog
   Color? _customColor;
 
   @override
@@ -28,7 +29,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     var msg = AppLocalizations.of(context)!;
-    _customColor ??= Provider.of<ThemeNotifier>(context).accentColor;
     return Scaffold(
       appBar: AppBar(
         title: Text(msg.settings),
@@ -51,28 +51,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       Provider.of<ThemeNotifier>(context, listen: false).changeThemeMode(themeMode!)),
               const SizedBox(height: 32),
               Text(msg.colorTitle, style: _titleStyle),
-              BlockPicker(
-                  availableColors: [
-                    Colors.blue,
-                    Colors.indigo,
-                    Colors.purple,
-                    Colors.deepOrange,
-                    Colors.amber,
-                    Colors.lime,
-                    _customColor!
-                  ].distinct(by: (color) => color.value),
-                  pickerColor: Provider.of<ThemeNotifier>(context).accentColor,
-                  onColorChanged: (color) {
-                    setState(() => Provider.of<ThemeNotifier>(context, listen: false).changeAccentColor(color));
-                  },
-                  layoutBuilder: (BuildContext context, List<Color> colors, PickerItem child) {
-                    return GridView.count(
-                        shrinkWrap: true, crossAxisCount: 8, children: [for (Color color in colors) child(color)]);
-                  }),
+              _buildSimpleColorPicker(),
               const SizedBox(height: 4),
               ElevatedButton(
                   onPressed: () {
-                    _showColorPicker(context);
+                    _showAdvancedColorPicker(context);
                   },
                   child: Text(msg.colorPickerButton)),
               const SizedBox(height: 32),
@@ -94,7 +77,32 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showColorPicker(BuildContext context) {
+  Widget _buildSimpleColorPicker() {
+    // if no custom color selected, fallback to users accentColor
+    _customColor ??= Provider.of<ThemeNotifier>(context).accentColor;
+    return BlockPicker(
+      // use unique key to force update of selected color when changed via dialog
+      key: UniqueKey(),
+      availableColors: [
+        Colors.blue,
+        Colors.indigo,
+        Colors.purple,
+        Colors.deepOrange,
+        Colors.amber,
+        Colors.lime,
+        _customColor! // can never be null because of fallback to accent color
+      ].distinct(by: (color) => color.value),
+      // remove duplicates (custom color may be a predefined color)
+      pickerColor: Provider.of<ThemeNotifier>(context).accentColor,
+      onColorChanged: (color) => Provider.of<ThemeNotifier>(context, listen: false).changeAccentColor(color),
+      layoutBuilder: (BuildContext context, List<Color> colors, PickerItem child) {
+        return GridView.count(
+            shrinkWrap: true, crossAxisCount: 8, children: [for (Color color in colors) child(color)]);
+      },
+    );
+  }
+
+  void _showAdvancedColorPicker(BuildContext context) {
     Color pickedColor = Provider.of<ThemeNotifier>(context, listen: false).accentColor;
     var msg = AppLocalizations.of(context)!;
     showDialog(
@@ -105,6 +113,7 @@ class _SettingsPageState extends State<SettingsPage> {
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: pickedColor,
+              enableAlpha: false,
               onColorChanged: (color) {
                 pickedColor = color;
               },
@@ -114,17 +123,17 @@ class _SettingsPageState extends State<SettingsPage> {
             TextButton(
               child: Text(msg.colorPickerCancel),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // close dialog
               },
             ),
             TextButton(
               child: Text(msg.colorPickerConfirm),
-              onPressed: () {
+              onPressed: () async {
                 setState(() {
                   _customColor = pickedColor;
-                  Provider.of<ThemeNotifier>(context, listen: false).changeAccentColor(pickedColor);
                 });
-                Navigator.of(context).pop();
+                await Provider.of<ThemeNotifier>(context, listen: false).changeAccentColor(pickedColor);
+                Navigator.of(context).pop(); // close dialog
               },
             )
           ],

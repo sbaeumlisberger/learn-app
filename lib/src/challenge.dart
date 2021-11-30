@@ -49,30 +49,8 @@ class _ChallengePageState extends State<ChallengePage> {
   @override
   void initState() {
     super.initState();
-    _startChallenge();
     _highscore = _persistenceService.getInt("highscore") ?? 0;
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    _timer = null;
-    _remainingTime = _challengeTime;
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {
-        _remainingTime = Duration(seconds: _remainingTime.inSeconds - 1);
-        if (_remainingTime.inSeconds == 0) {
-          _timer?.cancel();
-          _timer = null;
-          _newHighscore = _exercises > _highscore;
-          _goodResult = !_newHighscore && _exercises > _highscore * 0.7;
-          _badResult = !_newHighscore && !_goodResult;
-          _finished = true;
-          if (_newHighscore) {
-            _persistenceService.setInt("highscore", _exercises);
-          }
-        }
-      });
-    });
+    _startChallenge();
   }
 
   @override
@@ -84,7 +62,6 @@ class _ChallengePageState extends State<ChallengePage> {
   @override
   Widget build(BuildContext context) {
     var msg = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(msg.appTitle),
@@ -151,7 +128,10 @@ class _ChallengePageState extends State<ChallengePage> {
       padding: const EdgeInsets.all(4),
       child: ElevatedButton(
         onPressed: () {
-          _selectedAnswer == 0 ? _check(answer) : null;
+          // ignore while an answer is selected
+          if (_selectedAnswer == 0) {
+            _check(answer);
+          }
         },
         child: Text(answer.toString(), style: const TextStyle(fontSize: 20)),
         style: _selectedAnswer == answer
@@ -214,6 +194,31 @@ class _ChallengePageState extends State<ChallengePage> {
     });
   }
 
+  void _startTimer() {
+    _remainingTime = _challengeTime; // reset remaining time
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _timerCallback());
+  }
+
+  Future<void> _timerCallback() async {
+    setState(() {
+      _remainingTime = Duration(seconds: _remainingTime.inSeconds - 1);
+      if (_remainingTime.inSeconds == 0) {
+        _timer?.cancel();
+        _timer = null;
+        _newHighscore = _exercises > _highscore;
+        // for a good result min 70% of current highscore are required
+        _goodResult = !_newHighscore && _exercises >= _highscore * 0.7;
+        _badResult = !_newHighscore && !_goodResult;
+        _finished = true;
+      }
+    });
+    if (_newHighscore) {
+      _highscore = _exercises;
+      await _persistenceService.setInt("highscore", _exercises);
+    }
+  }
+
   int _randomResult(List<int> exclude) {
     int result = 0;
     do {
@@ -233,8 +238,10 @@ class _ChallengePageState extends State<ChallengePage> {
 
     if (answerCorrect) {
       _exercises++;
+      // show next exercises after 500ms feedback
       Future.delayed(const Duration(milliseconds: 500), _next);
     } else {
+      // allow new try after 500ms feedback
       Future.delayed(const Duration(milliseconds: 500), _resetSelection);
     }
   }

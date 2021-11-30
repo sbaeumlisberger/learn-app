@@ -9,9 +9,9 @@ import 'package:learn_app/src/welcome.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  setupServiceLocator();
-  await getIt<PersistenceService>().init();
-  runApp(const LearnApp());
+  setupServiceLocator(); // must be called before using getIt
+  await getIt<PersistenceService>().init(); // wait for initialization of persistence service
+  runApp(const LearnApp()); // start the app
 }
 
 class LearnApp extends StatelessWidget {

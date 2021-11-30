@@ -5,7 +5,7 @@ class PersistenceService {
   late SharedPreferences _sharedPreferences;
 
   Future<void> init() async {
-    WidgetsFlutterBinding.ensureInitialized();
+    WidgetsFlutterBinding.ensureInitialized(); // needed to access SharedPreferences
     _sharedPreferences = await SharedPreferences.getInstance();
   }
 
@@ -21,11 +21,11 @@ class PersistenceService {
     return _sharedPreferences.getInt(key);
   }
 
-  void setString(String key, String value) {
-    _sharedPreferences.setString(key, value);
+  Future setString(String key, String value) {
+    return _sharedPreferences.setString(key, value);
   }
 
-  void setInt(String key, int value) {
-    _sharedPreferences.setInt(key, value);
+  Future setInt(String key, int value) {
+    return _sharedPreferences.setInt(key, value);
   }
 }

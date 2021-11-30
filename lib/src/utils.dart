@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class Utils {
+
+  /// Converts a Color to a MaterialColor
   static MaterialColor toMaterialColor(Color color) {
     return MaterialColor(color.value, {
       50: Color.fromRGBO(color.red, color.green, color.blue, 0.1),

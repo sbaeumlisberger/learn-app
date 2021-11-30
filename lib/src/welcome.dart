@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:learn_app/src/home.dart';
+import 'package:learn_app/src/persistence_service.dart';
+import 'package:learn_app/src/service_locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -11,6 +13,8 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+  final _persistenceService = getIt<PersistenceService>();
+
   final _nameController = TextEditingController();
 
   @override
@@ -44,8 +48,8 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 
   void _next() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setString('username', _nameController.value.text);
+    // persist entered username
+    await _persistenceService.setString('username', _nameController.value.text);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),

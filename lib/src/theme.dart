@@ -12,6 +12,7 @@ class ThemeNotifier extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
 
   ThemeNotifier() {
+    // load persisted theme information, fallback to default values (blue, system)
     _accentColor = Color(_persistenceService.getInt("accentColor") ?? Colors.blue.value);
     _themeMode = ThemeMode.values[_persistenceService.getInt("themeMode") ?? ThemeMode.system.index];
   }
@@ -24,15 +25,15 @@ class ThemeNotifier extends ChangeNotifier {
     return _themeMode;
   }
 
-  void changeAccentColor(Color accentColor) {
+  Future<void> changeAccentColor(Color accentColor) async {
     _accentColor = accentColor;
-    _persistenceService.setInt("accentColor", accentColor.value);
+    await _persistenceService.setInt("accentColor", accentColor.value);
     notifyListeners();
   }
 
-  void changeThemeMode(ThemeMode themeMode) {
+  Future<void> changeThemeMode(ThemeMode themeMode) async {
     _themeMode = themeMode;
-    _persistenceService.setInt("themeMode", themeMode.index);
+    await _persistenceService.setInt("themeMode", themeMode.index);
     notifyListeners();
   }
 }
