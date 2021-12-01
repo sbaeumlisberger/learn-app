@@ -6,8 +6,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
-import '../main.dart';
-
 /// The settings page allows the user to change the theme and accent color.
 /// Furthermore credits and a link to the source code are part of the page
 class SettingsPage extends StatefulWidget {
